@@ -31,108 +31,101 @@
         }
     </style>
     
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
-<body class="bg-gradient-to-br from-indigo-100 via-purple-100 to-teal-100 animate-gradient-xy p-4 md:p-8 flex justify-center items-center h-screen overflow-hidden text-slate-800">
+<body class="bg-gradient-to-br from-indigo-100 via-purple-100 to-teal-100 animate-gradient-xy p-4 min-h-screen text-slate-800 flex items-center justify-center">
 
-    <div class="w-full max-w-7xl h-[90vh] glass-panel rounded-[3rem] flex flex-col relative overflow-hidden">
+    <div class="w-full max-w-7xl h-auto min-h-[90vh] glass-panel rounded-[2rem] md:rounded-[3rem] flex flex-col relative overflow-hidden my-4">
         
-        <!-- ป้ายแจ้งเตือน SOS -->
-        <div id="sos-sent-banner" class="hidden absolute inset-0 z-50 bg-red-600/90 backdrop-blur-md text-white p-12 flex flex-col justify-center items-center text-center">
-            <div class="text-9xl mb-6 animate-pulse drop-shadow-2xl">🚨</div>
-            <h2 class="text-6xl font-extrabold mb-6 tracking-wide drop-shadow-lg">กำลังเรียกให้คนมาช่วย!</h2>
-            <p class="text-3xl font-medium mb-12 text-red-100">ระบบได้ส่งสัญญาณช่วยเหลือไปที่มือถือของคุณต้นแล้วจ้ะ รอสักครู่นะ</p>
-            <button onclick="cancelSOS()" class="bg-white text-red-600 font-bold px-12 py-5 rounded-full text-3xl shadow-[0_10px_40px_rgba(255,255,255,0.3)] hover:bg-slate-100 hover:scale-105 transition-all duration-300">
+        <div id="sos-sent-banner" class="hidden absolute inset-0 z-50 bg-red-600/95 backdrop-blur-md text-white p-6 md:p-12 flex flex-col justify-center items-center text-center">
+            <div class="text-7xl md:text-9xl mb-4 animate-pulse drop-shadow-2xl">🚨</div>
+            <h2 class="text-4xl md:text-6xl font-extrabold mb-4 tracking-wide drop-shadow-lg">กำลังเรียกให้คนมาช่วย!</h2>
+            <p class="text-xl md:text-3xl font-medium mb-8 text-red-100">ระบบได้ส่งสัญญาณช่วยเหลือไปที่มือถือของคุณต้นแล้วจ้ะ รอสักครู่นะ</p>
+            <button onclick="cancelSOS()" class="bg-white text-red-600 font-bold px-8 py-4 rounded-full text-xl md:text-3xl shadow-[0_10px_40px_rgba(255,255,255,0.3)] hover:bg-slate-100 transition-all duration-300">
                 ยกเลิกการส่งสัญญาณ
             </button>
         </div>
 
-        <!-- ส่วนหัว (Header) -->
-        <header class="p-6 md:px-10 flex items-center justify-between shrink-0 border-b border-white/50 bg-white/30">
-            <div class="flex items-center gap-6">
+        <header class="p-6 md:px-10 flex flex-col md:flex-row items-center justify-between shrink-0 border-b border-white/50 bg-white/30 gap-6">
+            <div class="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
                 <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-400 to-purple-400 p-1 shadow-lg shrink-0">
                     <div class="w-full h-full bg-white rounded-full overflow-hidden flex justify-center items-center">
                         <img src="https://cdn-icons-png.flaticon.com/512/4333/4333044.png" alt="Grandma Avatar" class="w-full h-full object-cover">
                     </div>
                 </div>
                 <div>
-                    <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-purple-600 drop-shadow-sm">WE CARE</h1>
-                    <p class="text-slate-600 text-xl font-bold mt-1 flex items-center gap-2">
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-purple-600 drop-shadow-sm">WE CARE</h1>
+                    <p class="text-slate-600 text-lg md:text-xl font-bold mt-1 flex items-center justify-center md:justify-start gap-2">
                         สวัสดีจ้ะ, คุณยาย ❤️
                         <span class="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold border border-indigo-200 shadow-sm">v 1.1</span>
                     </p>
                 </div>
             </div>
             
-            <div class="flex items-center gap-4">
-                <div class="hidden md:flex items-center gap-3 bg-white/60 px-5 py-2.5 rounded-full border border-white shadow-sm">
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+                <div class="flex items-center gap-3 bg-white/60 px-5 py-2.5 rounded-full border border-white shadow-sm">
                     <span class="relative flex h-4 w-4">
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500"></span>
                     </span>
-                    <span class="text-slate-700 font-bold text-md">ระบบออนไลน์</span>
+                    <span class="text-slate-700 font-bold text-sm md:text-md">ระบบออนไลน์</span>
                 </div>
-                <!-- โลโก้โครงการ -->
                 <div class="flex gap-2">
-                    <img src="3040_0.jpg" alt="KU KUSK" class="h-14 w-auto object-contain rounded-xl shadow-md border-2 border-white bg-white">
-                    <img src="3039_0.jpg" alt="Robotics Playground" class="h-14 w-auto object-contain rounded-xl shadow-md border-2 border-white bg-white">
+                    <img src="3040_0.jpg" alt="KU KUSK" class="h-10 md:h-14 w-auto object-contain rounded-xl shadow-md border-2 border-white bg-white">
+                    <img src="3039_0.jpg" alt="Robotics Playground" class="h-10 md:h-14 w-auto object-contain rounded-xl shadow-md border-2 border-white bg-white">
                 </div>
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-8 flex gap-8 overflow-hidden">
+        <main class="flex-1 p-4 md:p-8 flex flex-col lg:flex-row gap-8">
             
-            <!-- โซน 1: อุปกรณ์ -->
             <div class="flex-1 flex flex-col gap-4">
-                <div class="flex items-center gap-3 px-2">
-                    <span class="text-3xl">🏠</span>
-                    <h2 class="text-2xl font-bold text-slate-700">ควบคุมห้องของยาย</h2>
+                <div class="flex items-center justify-center md:justify-start gap-3 px-2">
+                    <span class="text-2xl md:text-3xl">🏠</span>
+                    <h2 class="text-xl md:text-2xl font-bold text-slate-700">ควบคุมห้องของยาย</h2>
                 </div>
-                <div class="grid grid-cols-2 gap-6 flex-1">
-                    <button onclick="toggleDevice('light')" class="glass-button hover:-translate-y-2 text-amber-600 p-6 rounded-[2.5rem] flex flex-col items-center justify-center transition-all duration-300 group">
-                        <div class="w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-inner">
-                            <span class="text-6xl">💡</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+                    <button onclick="toggleDevice('light')" class="glass-button active:scale-95 hover:-translate-y-1 text-amber-600 p-6 rounded-[2rem] flex flex-col items-center justify-center transition-all duration-300">
+                        <div class="w-16 h-16 md:w-24 md:h-24 bg-amber-100 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                            <span class="text-4xl md:text-6xl">💡</span>
                         </div>
-                        <span class="text-2xl font-extrabold text-slate-800">ไฟห้อง</span>
-                        <span class="bg-slate-100 px-4 py-1.5 rounded-full text-sm mt-3 font-bold border border-slate-200" id="light-status">สถานะ: ปิด 🔴</span>
+                        <span class="text-xl md:text-2xl font-extrabold text-slate-800">ไฟห้อง</span>
+                        <span class="bg-slate-100 px-4 py-1.5 rounded-full text-xs md:text-sm mt-3 font-bold border border-slate-200" id="light-status">สถานะ: ปิด 🔴</span>
                     </button>
                     
-                    <button onclick="toggleDevice('water')" class="glass-button hover:-translate-y-2 text-emerald-600 p-6 rounded-[2.5rem] flex flex-col items-center justify-center transition-all duration-300 group">
-                        <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-inner">
-                            <span class="text-6xl">🌱</span>
+                    <button onclick="toggleDevice('water')" class="glass-button active:scale-95 hover:-translate-y-1 text-emerald-600 p-6 rounded-[2rem] flex flex-col items-center justify-center transition-all duration-300">
+                        <div class="w-16 h-16 md:w-24 md:h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                            <span class="text-4xl md:text-6xl">🌱</span>
                         </div>
-                        <span class="text-2xl font-extrabold text-slate-800">รดน้ำต้นไม้</span>
-                        <span class="bg-slate-100 px-4 py-1.5 rounded-full text-sm mt-3 font-bold border border-slate-200" id="water-status">สถานะ: ปิด 🔴</span>
+                        <span class="text-xl md:text-2xl font-extrabold text-slate-800">รดน้ำต้นไม้</span>
+                        <span class="bg-slate-100 px-4 py-1.5 rounded-full text-xs md:text-sm mt-3 font-bold border border-slate-200" id="water-status">สถานะ: ปิด 🔴</span>
                     </button>
                 </div>
             </div>
 
-            <!-- โซน 2: ช่วยเหลือ -->
             <div class="flex-1 flex flex-col gap-4">
-                <div class="flex items-center gap-3 px-2">
-                    <span class="text-3xl">🛠️</span>
-                    <h2 class="text-2xl font-bold text-slate-700">ฟังก์ชันช่วยเหลือด่วน</h2>
+                <div class="flex items-center justify-center md:justify-start gap-3 px-2">
+                    <span class="text-2xl md:text-3xl">🛠️</span>
+                    <h2 class="text-xl md:text-2xl font-bold text-slate-700">ฟังก์ชันช่วยเหลือด่วน</h2>
                 </div>
                 <div class="grid grid-cols-2 gap-4 flex-1">
-                    <button onclick="triggerFindItem()" class="glass-button hover:-translate-y-1 p-4 rounded-3xl flex flex-col items-center justify-center transition-all duration-300 group">
-                        <span class="text-5xl mb-2 group-hover:scale-110 transition-transform drop-shadow-sm">🔍</span>
-                        <span class="text-xl font-extrabold text-slate-800">ระบบหาของ</span>
-                        <span class="text-indigo-500 text-xs mt-1 font-bold">พวงกุญแจส่งเสียง</span>
+                    <button onclick="triggerFindItem()" class="glass-button active:scale-95 hover:-translate-y-1 p-4 rounded-[2rem] flex flex-col items-center justify-center transition-all duration-300 text-center">
+                        <span class="text-4xl md:text-5xl mb-2 drop-shadow-sm">🔍</span>
+                        <span class="text-lg md:text-xl font-extrabold text-slate-800 leading-tight">ระบบหาของ</span>
+                        <span class="text-indigo-500 text-[10px] md:text-xs mt-1 font-bold">พวงกุญแจส่งเสียง</span>
                     </button>
 
-                    <button onclick="acknowledgeMed()" class="glass-button hover:-translate-y-1 p-4 rounded-3xl flex flex-col items-center justify-center transition-all duration-300 group">
-                        <span class="text-5xl mb-2 group-hover:scale-110 transition-transform drop-shadow-sm">💊</span>
-                        <span class="text-xl font-extrabold text-slate-800">ตู้ยาของยาย</span>
-                        <span class="text-rose-500 text-xs mt-1 font-bold">กดยืนยันทานยา</span>
+                    <button onclick="acknowledgeMed()" class="glass-button active:scale-95 hover:-translate-y-1 p-4 rounded-[2rem] flex flex-col items-center justify-center transition-all duration-300 text-center">
+                        <span class="text-4xl md:text-5xl mb-2 drop-shadow-sm">💊</span>
+                        <span class="text-lg md:text-xl font-extrabold text-slate-800 leading-tight">ตู้ยาของยาย</span>
+                        <span class="text-rose-500 text-[10px] md:text-xs mt-1 font-bold">กดยืนยันทานยา</span>
                     </button>
 
-                    <button onclick="triggerSOS()" class="col-span-2 bg-gradient-to-r from-red-500 to-rose-600 text-white p-4 rounded-3xl flex flex-col items-center justify-center transition-all duration-300 shadow-[0_10px_25px_rgba(239,68,68,0.4)] hover:shadow-[0_15px_35px_rgba(239,68,68,0.6)] hover:-translate-y-2 group border border-red-400">
-                        <span class="text-5xl mb-2 group-hover:animate-bounce drop-shadow-md">🚨</span>
-                        <span class="text-3xl font-black tracking-wide drop-shadow-sm">ส่งสัญญาณช่วยเหลือ</span>
-                        <span class="text-red-100 text-sm mt-1 font-semibold">เรียกคุณต้นให้มาช่วยด่วน</span>
+                    <button onclick="triggerSOS()" class="col-span-2 bg-gradient-to-r from-red-500 to-rose-600 text-white p-6 rounded-[2rem] flex flex-col items-center justify-center transition-all duration-300 shadow-[0_10px_25px_rgba(239,68,68,0.4)] active:scale-95 hover:-translate-y-1 border border-red-400">
+                        <span class="text-5xl md:text-6xl mb-2 drop-shadow-md">🚨</span>
+                        <span class="text-2xl md:text-3xl font-black tracking-wide drop-shadow-sm text-center">ส่งสัญญาณช่วยเหลือ</span>
+                        <span class="text-red-100 text-xs md:text-sm mt-2 font-semibold">เรียกคุณต้นให้มาช่วยด่วน</span>
                     </button>
                 </div>
             </div>
@@ -140,7 +133,6 @@
         </main>
     </div>
 
-    <!-- โค้ดหลังบ้านที่แก้ไขให้กดทำงานได้ 100% -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyD1pRA8LM0cisL6FTTLRLNp6e8mhGcE2lA",
@@ -166,18 +158,18 @@
             
             if(currentLight === 1) {
                 lightBtn.innerHTML = "สถานะ: <span class='text-emerald-600'>เปิด 🟢</span>";
-                lightBtn.className = "bg-emerald-50 px-4 py-1.5 rounded-full text-sm mt-3 font-bold border border-emerald-200";
+                lightBtn.className = "bg-emerald-50 px-4 py-1.5 rounded-full text-xs md:text-sm mt-3 font-bold border border-emerald-200";
             } else {
                 lightBtn.innerHTML = "สถานะ: <span class='text-slate-500'>ปิด 🔴</span>";
-                lightBtn.className = "bg-slate-100 px-4 py-1.5 rounded-full text-sm mt-3 font-bold border border-slate-200";
+                lightBtn.className = "bg-slate-100 px-4 py-1.5 rounded-full text-xs md:text-sm mt-3 font-bold border border-slate-200";
             }
 
             if(currentWater === 1) {
                 waterBtn.innerHTML = "สถานะ: <span class='text-emerald-600'>เปิด 🟢</span>";
-                waterBtn.className = "bg-emerald-50 px-4 py-1.5 rounded-full text-sm mt-3 font-bold border border-emerald-200";
+                waterBtn.className = "bg-emerald-50 px-4 py-1.5 rounded-full text-xs md:text-sm mt-3 font-bold border border-emerald-200";
             } else {
                 waterBtn.innerHTML = "สถานะ: <span class='text-slate-500'>ปิด 🔴</span>";
-                waterBtn.className = "bg-slate-100 px-4 py-1.5 rounded-full text-sm mt-3 font-bold border border-slate-200";
+                waterBtn.className = "bg-slate-100 px-4 py-1.5 rounded-full text-xs md:text-sm mt-3 font-bold border border-slate-200";
             }
         });
 
