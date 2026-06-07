@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WE CARE - Grandma Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; }
+        @keyframes gradient-xy {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .animate-gradient-xy {
+            background-size: 400% 400%;
+            animation: gradient-xy 15s ease infinite;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+        .glass-button {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-100 via-purple-100 to-teal-100 animate-gradient-xy p-4 md:p-8 flex justify-center items-center h-screen overflow-hidden text-slate-800">
+
+    <div class="w-full max-w-7xl h-[90vh] glass-panel rounded-[3rem] flex flex-col relative overflow-hidden">
+        
+        <!-- ป้ายแจ้งเตือน SOS -->
+        <div id="sos-sent-banner" class="hidden absolute inset-0 z-50 bg-red-600/90 backdrop-blur-md text-white p-12 flex flex-col justify-center items-center text-center">
+            <div class="text-9xl mb-6 animate-pulse drop-shadow-2xl">🚨</div>
+            <h2 class="text-6xl font-extrabold mb-6 tracking-wide drop-shadow-lg">กำลังเรียกให้คนมาช่วย!</h2>
+            <p class="text-3xl font-medium mb-12 text-red-100">ระบบได้ส่งสัญญาณช่วยเหลือไปที่มือถือของคุณต้นแล้วจ้ะ รอสักครู่นะ</p>
+            <button onclick="cancelSOS()" class="bg-white text-red-600 font-bold px-12 py-5 rounded-full text-3xl shadow-[0_10px_40px_rgba(255,255,255,0.3)] hover:bg-slate-100 hover:scale-105 transition-all duration-300">
+                ยกเลิกการส่งสัญญาณ
+            </button>
+        </div>
+
+        <!-- ส่วนหัว (Header) -->
+        <header class="p-6 md:px-10 flex items-center justify-between shrink-0 border-b border-white/50 bg-white/30">
+            <div class="flex items-center gap-6">
+                <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-400 to-purple-400 p-1 shadow-lg shrink-0">
+                    <div class="w-full h-full bg-white rounded-full overflow-hidden flex justify-center items-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4333/4333044.png" alt="Grandma Avatar" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-purple-600 drop-shadow-sm">WE CARE</h1>
+                    <p class="text-slate-600 text-xl font-bold mt-1 flex items-center gap-2">
+                        สวัสดีจ้ะ, คุณยาย ❤️
+                        <span class="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold border border-indigo-200 shadow-sm">v 1.1</span>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex items-center gap-3 bg-white/60 px-5 py-2.5 rounded-full border border-white shadow-sm">
+                    <span class="relative flex h-4 w-4">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-slate-700 font-bold text-md">ระบบออนไลน์</span>
+                </div>
+                <!-- โลโก้โครงการ -->
+                <div class="flex gap-2">
+                    <img src="3040_0.jpg" alt="KU KUSK" class="h-14 w-auto object-contain rounded-xl shadow-md border-2 border-white bg-white">
+                    <img src="3039_0.jpg" alt="Robotics Playground" class="h-14 w-auto object-contain rounded-xl shadow-md border-2 border-white bg-white">
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 flex gap-8 overflow-hidden">
+            
+            <!-- โซน 1: อุปกรณ์ -->
+            <div class="flex-1 flex flex-col gap-4">
+                <div class="flex items-center gap-3 px-2">
+                    <span class="text-3xl">🏠</span>
+                    <h2 class="text-2xl font-bold text-slate-700">ควบคุมห้องของยาย</h2>
+                </div>
+                <div class="grid grid-cols-2 gap-6 flex-1">
+                    <button onclick="toggleDevice('light')" class="glass-button hover:-translate-y-2 text-amber-600 p-6 rounded-[2.5rem] flex flex-col items-center justify-center transition-all duration-300 group">
+                        <div class="w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-inner">
+                            <span class="text-6xl">💡</span>
+                        </div>
+                        <span class="text-2xl font-extrabold text-slate-800">ไฟห้อง</span>
+                        <span class="bg-slate-100 px-4 py-1.5 rounded-full text-sm mt-3 font-bold border border-slate-200" id="light-status">สถานะ: ปิด 🔴</span>
+                    </button>
+                    
+                    <button onclick="toggleDevice('water')" class="glass-button hover:-translate-y-2 text-emerald-600 p-6 rounded-[2.5rem] flex flex-col items-center justify-center transition-all duration-300 group">
+                        <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-inner">
+                            <span class="text-6xl">🌱</span>
+                        </div>
+                        <span class="text-2xl font-extrabold text-slate-800">รดน้ำต้นไม้</span>
+                        <span class="bg-slate-100 px-4 py-1.5 rounded-full text-sm mt-3 font-bold border border-slate-200" id="water-status">สถานะ: ปิด 🔴</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- โซน 2: ช่วยเหลือ -->
+            <div class="flex-1 flex flex-col gap-4">
+                <div class="flex items-center gap-3 px-2">
+                    <span class="text-3xl">🛠️</span>
+                    <h2 class="text-2xl font-bold text-slate-700">ฟังก์ชันช่วยเหลือด่วน</h2>
+                </div>
+                <div class="grid grid-cols-2 gap-4 flex-1">
+                    <button onclick="triggerFindItem()" class="glass-button hover:-translate-y-1 p-4 rounded-3xl flex flex-col items-center justify-center transition-all duration-300 group">
+                        <span class="text-5xl mb-2 group-hover:scale-110 transition-transform drop-shadow-sm">🔍</span>
+                        <span class="text-xl font-extrabold text-slate-800">ระบบหาของ</span>
+                        <span class="text-indigo-500 text-xs mt-1 font-bold">พวงกุญแจส่งเสียง</span>
+                    </button>
+
+                    <button onclick="acknowledgeMed()" class="glass-button hover:-translate-y-1 p-4 rounded-3xl flex flex-col items-center justify-center transition-all duration-300 group">
+                        <span class="text-5xl mb-2 group-hover:scale-110 transition-transform drop-shadow-sm">💊</span>
+                        <span class="text-xl font-extrabold text-slate-800">ตู้ยาของยาย</span>
+                        <span class="text-rose-500 text-xs mt-1 font-bold">กดยืนยันทานยา</span>
+                    </button>
+
+                    <button onclick="triggerSOS()" class="col-span-2 bg-gradient-to-r from-red-500 to-rose-600 text-white p-4 rounded-3xl flex flex-col items-center justify-center transition-all duration-300 shadow-[0_10px_25px_rgba(239,68,68,0.4)] hover:shadow-[0_15px_35px_rgba(239,68,68,0.6)] hover:-translate-y-2 group border border-red-400">
+                        <span class="text-5xl mb-2 group-hover:animate-bounce drop-shadow-md">🚨</span>
+                        <span class="text-3xl font-black tracking-wide drop-shadow-sm">ส่งสัญญาณช่วยเหลือ</span>
+                        <span class="text-red-100 text-sm mt-1 font-semibold">เรียกคุณต้นให้มาช่วยด่วน</span>
+                    </button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- โค้ดหลังบ้านที่แก้ไขให้กดทำงานได้ 100% -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD1pRA8LM0cisL6FTTLRLNp6e8mhGcE2lA",
+            authDomain: "smarthome-elderly-6273a.firebaseapp.com",
+            databaseURL: "https://smarthome-elderly-6273a-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "smarthome-elderly-6273a",
+            storageBucket: "smarthome-elderly-6273a.firebasestorage.app",
+            messagingSenderId: "1066038258843",
+            appId: "1:1066038258843:web:1033b3916b228a97a56a3e"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let currentLight = 0; let currentWater = 0;
+
+        db.ref('WeCare').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if(!data) return;
+            if(data.Light !== undefined) currentLight = data.Light;
+            if(data.Pump !== undefined) currentWater = data.Pump;
+            
+            const lightBtn = document.getElementById('light-status');
+            const waterBtn = document.getElementById('water-status');
+            
+            if(currentLight === 1) {
+                lightBtn.innerHTML = "สถานะ: <span class='text-emerald-600'>เปิด 🟢</span>";
+                lightBtn.className = "bg-emerald-50 px-4 py-1.5 rounded-full text-sm mt-3 font-bold border border-emerald-200";
+            } else {
+                lightBtn.innerHTML = "สถานะ: <span class='text-slate-500'>ปิด 🔴</span>";
+                lightBtn.className = "bg-slate-100 px-4 py-1.5 rounded-full text-sm mt-3 font-bold border border-slate-200";
+            }
+
+            if(currentWater === 1) {
+                waterBtn.innerHTML = "สถานะ: <span class='text-emerald-600'>เปิด 🟢</span>";
+                waterBtn.className = "bg-emerald-50 px-4 py-1.5 rounded-full text-sm mt-3 font-bold border border-emerald-200";
+            } else {
+                waterBtn.innerHTML = "สถานะ: <span class='text-slate-500'>ปิด 🔴</span>";
+                waterBtn.className = "bg-slate-100 px-4 py-1.5 rounded-full text-sm mt-3 font-bold border border-slate-200";
+            }
+        });
+
+        function toggleDevice(device) {
+            if(device === 'light') {
+                let newState = (currentLight === 1) ? 0 : 1;
+                db.ref('WeCare').update({ Light: newState });
+            } else if(device === 'water') {
+                let newState = (currentWater === 1) ? 0 : 1;
+                db.ref('WeCare').update({ Pump: newState });
+            }
+        }
+        function triggerSOS() {
+            db.ref('WeCare').update({ SOS_From_Home: 1 });
+            document.getElementById('sos-sent-banner').classList.remove('hidden');
+            let audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+            audio.play().catch(e => console.log("รอให้คลิกหน้าเว็บก่อน"));
+        }
+        function cancelSOS() {
+            db.ref('WeCare').update({ SOS_From_Home: 0 });
+            document.getElementById('sos-sent-banner').classList.add('hidden');
+        }
+        function triggerFindItem() {
+            db.ref('WeCare').update({ Find_Item: 1 });
+            alert("กำลังส่งเสียงร้องที่พวงกุญแจจ้ะยาย!");
+            setTimeout(() => { db.ref('WeCare').update({ Find_Item: 0 }); }, 5000);
+        }
+        function acknowledgeMed() {
+            db.ref('WeCare').update({ Med_Alert: 0 });
+            alert("บันทึกแล้วจ้ะยายว่าทานยาแล้ว เก่งมากครับ!");
+        }
+    </script>
+</body>
+</html>
