@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WE CARE - AI Fall Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #0f172a; color: white; }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        /* พลิกกล้องให้เป็นเหมือนกระจกเงา */
+        #output_canvas { transform: scaleX(-1); }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden p-4 md:p-8">
+
+    <header class="flex items-center justify-between mb-6 shrink-0">
+        <div class="flex items-center gap-4">
+            <span class="text-4xl animate-pulse">📷</span>
+            <div>
+                <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">AI Fall Detection Camera</h1>
+                <p class="text-slate-400 font-semibold">ระบบประมวลผลภาพจับการล้ม</p>
+            </div>
+        </div>
+        <div id="ai-status" class="bg-slate-800 border border-slate-600 px-6 py-3 rounded-full flex items-center gap-3">
+            <span class="relative flex h-4 w-4">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-4 w-4 bg-cyan-500"></span>
+            </span>
+            <span class="font-bold text-cyan-400">กำลังเปิดกล้อง...</span>
+        </div>
+    </header>
+
+    <main class="flex-1 flex gap-6 overflow-hidden">
+        
+        <div class="flex-1 glass-panel rounded-3xl overflow-hidden relative shadow-2xl flex items-center justify-center border-2 border-slate-700">
+            <video id="input_video" class="hidden" autoplay playsinline></video>
+            <canvas id="output_canvas" class="w-full h-full object-contain"></canvas>
+            
+            <div id="fall-alert" class="hidden absolute inset-0 bg-red-600/80 backdrop-blur-sm flex flex-col items-center justify-center text-center z-50">
+                <span class="text-9xl mb-4 animate-bounce">🚨</span>
+                <h2 class="text-5xl font-black text-white drop-shadow-lg mb-2">ตรวจพบการล้ม!</h2>
+                <p class="text-xl text-red-100 font-bold mb-8">ส่งสัญญาณฉุกเฉินเข้าระบบเรียบร้อยแล้ว</p>
+                <button onclick="resetFall()" class="bg-white text-red-600 px-8 py-3 rounded-full font-bold text-2xl hover:scale-105 transition">
+                    รับทราบ & รีเซ็ตระบบกล้อง
+                </button>
+            </div>
+        </div>
+
+        <div class="w-80 flex flex-col gap-4">
+            <div class="glass-panel p-6 rounded-3xl">
+                <h3 class="text-xl font-bold text-slate-300 mb-4">ข้อมูลวิเคราะห์ (Real-time)</h3>
+                <div class="space-y-4">
+                    <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-600">
+                        <p class="text-sm text-slate-400">สถานะร่างกาย</p>
+                        <p id="posture-text" class="text-2xl font-black text-emerald-400">ปกติ (ยืน/นั่ง)</p>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-500 mt-6 mt-4">
+                    * AI จะตรวจจับจุดใบหน้า (Nose) ว่าต่ำกว่าระดับสะโพก (Hips) หรือไม่ หากล้มลงไปนอน ระบบจะนับถอยหลัง 2 วินาทีเพื่อส่งสัญญาณ
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 1. ตั้งค่า Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyD1pRA8LM0cisL6FTTLRLNp6e8mhGcE2lA",
+            authDomain: "smarthome-elderly-6273a.firebaseapp.com",
+            databaseURL: "https://smarthome-elderly-6273a-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "smarthome-elderly-6273a",
+            storageBucket: "smarthome-elderly-6273a.firebasestorage.app",
+            messagingSenderId: "1066038258843",
+            appId: "1:1066038258843:web:1033b3916b228a97a56a3e"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // 2. ดึง element มาใช้งาน
+        const videoElement = document.getElementById('input_video');
+        const canvasElement = document.getElementById('output_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const postureText = document.getElementById('posture-text');
+        const fallAlert = document.getElementById('fall-alert');
+        const statusText = document.getElementById('ai-status');
+
+        let fallTimer = 0; // ตัวนับเฟรมตอนล้ม (กัน false positive)
+        let isFallen = false;
+
+        // 3. ฟังก์ชันประมวลผลภาพจาก AI
+        function onResults(results) {
+            // ปรับขนาดแคนวาสให้ตรงกับวิดีโอ
+            canvasElement.width = videoElement.videoWidth;
+            canvasElement.height = videoElement.videoHeight;
+            
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+            if (results.poseLandmarks && !isFallen) {
+                // วาดเส้นโครงกระดูกทับลงไป
+                for(let i = 0; i < results.poseLandmarks.length; i++) {
+                    const lm = results.poseLandmarks[i];
+                    canvasCtx.beginPath();
+                    canvasCtx.arc(lm.x * canvasElement.width, lm.y * canvasElement.height, 5, 0, 2 * Math.PI);
+                    canvasCtx.fillStyle = '#06b6d4';
+                    canvasCtx.fill();
+                }
+
+                // วิเคราะห์การล้ม (จมูก เทียบกับ สะโพก)
+                const nose = results.poseLandmarks[0];
+                const leftHip = results.poseLandmarks[23];
+                const rightHip = results.poseLandmarks[24];
+                
+                // หาค่ากลางของระดับสะโพก
+                const midHipY = (leftHip.y + rightHip.y) / 2;
+
+                // ตรรกะ: ถ้าค่า Y ของจมูก มากกว่า (คืออยู่ต่ำกว่า) ระดับสะโพก = ล้ม
+                if (nose.y > midHipY) {
+                    fallTimer++;
+                    postureText.innerText = "กำลังล้ม!! (" + fallTimer + ")";
+                    postureText.className = "text-2xl font-black text-amber-500";
+                    
+                    // ถ้านอนล้มค้างไว้เกิน 25 เฟรม (ประมาณ 1 วินาที) ให้ถือว่าล้มจริง
+                    if (fallTimer > 25) {
+                        triggerFallEvent();
+                    }
+                } else {
+                    fallTimer = 0; // รีเซ็ตถ้ายืนขึ้น
+                    postureText.innerText = "ปกติ (ยืน/นั่ง)";
+                    postureText.className = "text-2xl font-black text-emerald-400";
+                }
+            }
+            canvasCtx.restore();
+        }
+
+        // 4. ตั้งค่า MediaPipe Pose Model
+        const pose = new Pose({locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+        }});
+        pose.setOptions({
+            modelComplexity: 1,
+            smoothLandmarks: true,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+        pose.onResults(onResults);
+
+        // 5. เปิดกล้อง
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await pose.send({image: videoElement});
+            },
+            width: 640,
+            height: 480
+        });
+        
+        camera.start().then(() => {
+            statusText.innerHTML = `<span class="relative flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500"></span></span><span class="font-bold text-emerald-400">AI พร้อมทำงาน</span>`;
+        });
+
+        // 6. ส่งข้อมูลเข้าฐานข้อมูลเมื่อตรวจพบการล้ม
+        function triggerFallEvent() {
+            isFallen = true;
+            fallAlert.classList.remove('hidden');
+            postureText.innerText = "ล้ม!! แจ้งเตือนฉุกเฉิน";
+            postureText.className = "text-2xl font-black text-red-500";
+            
+            // สั่งยิง SOS เข้า Firebase ให้ไซเรนดังทั่วบ้าน!
+            db.ref('WeCare').update({ SOS_From_Home: 1 });
+            
+            // เสียงแจ้งเตือนจากกล้อง
+            let audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+            audio.play().catch(e => console.log("Audio play prevented"));
+        }
+
+        function resetFall() {
+            isFallen = false;
+            fallTimer = 0;
+            fallAlert.classList.add('hidden');
+            db.ref('WeCare').update({ SOS_From_Home: 0 }); // ปิดเสียงไซเรน
+        }
+    </script>
+</body>
+</html>
