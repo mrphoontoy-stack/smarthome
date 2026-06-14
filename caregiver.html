@@ -57,8 +57,8 @@
                 <div>
                     <h1 class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-indigo-900 drop-shadow-sm">WE CARE</h1>
                     <p class="text-slate-600 text-lg md:text-xl font-bold mt-1 flex items-center justify-center md:justify-start gap-2">
-                        ศูนย์ควบคุม: คุณต้น
-                        <span class="text-xs bg-slate-800 text-slate-100 px-3 py-1 rounded-full font-bold shadow-sm border border-slate-700">v 1.1</span>
+                        ศูนย์ควบคุมผู้ดูแล
+                        <span class="text-xs bg-slate-800 text-slate-100 px-3 py-1 rounded-full font-bold shadow-sm border border-slate-700">v 1.3</span>
                     </p>
                 </div>
             </div>
@@ -86,24 +86,28 @@
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">แผงสั่งการระยะไกล</h2>
                 </div>
                 
-                <div class="grid grid-cols-1 gap-4 md:gap-6 flex-1">
-                    <button onclick="sendMedReminder()" class="glass-button active:scale-95 hover:-translate-y-1 p-4 md:p-6 rounded-[2rem] flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 transition-all duration-300">
-                        <div class="w-16 h-16 md:w-24 md:h-24 bg-rose-100 rounded-full flex items-center justify-center shrink-0 shadow-inner">
-                            <span class="text-4xl md:text-6xl">💊</span>
-                        </div>
+                <div class="grid grid-cols-1 gap-4 flex-1">
+                    <button onclick="sendMedReminder('morning')" class="glass-button active:scale-95 hover:-translate-y-1 p-4 rounded-[2rem] flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 transition-all duration-300">
+                        <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center shrink-0 shadow-inner"><span class="text-4xl">☀️</span></div>
                         <div>
-                            <span class="block text-xl md:text-3xl font-extrabold text-slate-800 mb-1">เตือนยายทานยา</span>
-                            <span class="block text-rose-600 font-semibold bg-rose-50 px-3 py-1 rounded-lg border border-rose-100 text-xs md:text-sm">สั่งเปิดไฟ/เสียงที่ตู้ยา</span>
+                            <span class="block text-xl font-extrabold text-slate-800">ส่งสัญญาณเตือน "ยาเช้า"</span>
+                            <span class="block text-amber-600 font-semibold text-xs">เปิดไฟและเสียงเตือนมื้อเช้า</span>
                         </div>
                     </button>
                     
-                    <button onclick="triggerFindItem()" class="glass-button active:scale-95 hover:-translate-y-1 p-4 md:p-6 rounded-[2rem] flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 transition-all duration-300">
-                        <div class="w-16 h-16 md:w-24 md:h-24 bg-indigo-100 rounded-full flex items-center justify-center shrink-0 shadow-inner">
-                            <span class="text-4xl md:text-6xl">🔍</span>
-                        </div>
+                    <button onclick="sendMedReminder('evening')" class="glass-button active:scale-95 hover:-translate-y-1 p-4 rounded-[2rem] flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 transition-all duration-300">
+                        <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center shrink-0 shadow-inner"><span class="text-4xl">🌙</span></div>
                         <div>
-                            <span class="block text-xl md:text-3xl font-extrabold text-slate-800 mb-1">ช่วยคุณยายหาของ</span>
-                            <span class="block text-indigo-600 font-semibold bg-indigo-50 px-3 py-1 rounded-lg border border-indigo-100 text-xs md:text-sm">ส่งเสียงเตือนที่พวงกุญแจ</span>
+                            <span class="block text-xl font-extrabold text-slate-800">ส่งสัญญาณเตือน "ยาเย็น"</span>
+                            <span class="block text-indigo-600 font-semibold text-xs">เปิดไฟและเสียงเตือนมื้อเย็น</span>
+                        </div>
+                    </button>
+                    
+                    <button onclick="triggerFindItem()" class="glass-button active:scale-95 hover:-translate-y-1 p-4 rounded-[2rem] flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 transition-all duration-300">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center shrink-0 shadow-inner"><span class="text-4xl">🔍</span></div>
+                        <div>
+                            <span class="block text-xl font-extrabold text-slate-800">ช่วยคุณยายหาของ</span>
+                            <span class="block text-blue-600 font-semibold text-xs">ส่งเสียงเตือนที่พวงกุญแจ</span>
                         </div>
                     </button>
                 </div>
@@ -115,17 +119,22 @@
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800">ระบบมอนิเตอร์สถานะ</h2>
                 </div>
 
-                <div class="flex-1 flex flex-col gap-4 md:gap-6">
-                    <div id="med-status-card" class="bg-white/80 border border-white shadow-lg p-6 md:p-8 rounded-[2rem] flex flex-col items-center justify-center transition-all duration-500 relative overflow-hidden text-center">
-                        <span id="med-icon" class="text-5xl md:text-7xl mb-2 drop-shadow-md z-10">✅</span>
-                        <h3 id="med-title" class="text-xl md:text-3xl font-extrabold text-slate-800 mb-2 z-10">สถานะการทานยาปกติ</h3>
-                        <p id="med-desc" class="text-slate-600 font-semibold text-sm md:text-lg z-10 bg-white/50 px-4 py-1 rounded-full">ยังไม่ถึงเวลา หรือทานเรียบร้อยแล้ว</p>
+                <div class="flex-1 flex flex-col gap-4">
+                    <div id="card-med-morning" class="bg-white/80 border border-white shadow-lg p-5 rounded-[2rem] flex flex-col items-center justify-center text-center transition-all duration-500">
+                        <span id="icon-med-morning" class="text-4xl mb-1">✅</span>
+                        <h3 id="title-med-morning" class="text-xl font-extrabold text-slate-800">ยาเช้า: ปกติ</h3>
+                        <p id="desc-med-morning" class="text-slate-500 font-semibold text-sm">คุณยายทานยาเรียบร้อยแล้ว</p>
                     </div>
 
-                    <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 shadow-lg p-6 md:p-8 rounded-[2rem] flex flex-col items-center justify-center flex-1 relative overflow-hidden text-center">
-                        <span class="text-5xl md:text-7xl mb-2 drop-shadow-md z-10">🛡️</span>
-                        <h3 class="text-xl md:text-3xl font-extrabold text-emerald-800 mb-2 z-10">ระบบเฝ้าระวังปกติ</h3>
-                        <p class="text-emerald-700 font-semibold text-sm md:text-lg z-10 bg-emerald-100/50 px-4 py-1 rounded-full">Standby รอรับสัญญาณฉุกเฉิน</p>
+                    <div id="card-med-evening" class="bg-white/80 border border-white shadow-lg p-5 rounded-[2rem] flex flex-col items-center justify-center text-center transition-all duration-500">
+                        <span id="icon-med-evening" class="text-4xl mb-1">✅</span>
+                        <h3 id="title-med-evening" class="text-xl font-extrabold text-slate-800">ยาเย็น: ปกติ</h3>
+                        <p id="desc-med-evening" class="text-slate-500 font-semibold text-sm">คุณยายทานยาเรียบร้อยแล้ว</p>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 shadow-lg p-5 rounded-[2rem] flex flex-col items-center justify-center text-center relative overflow-hidden">
+                        <span class="text-4xl mb-1">🛡️</span>
+                        <h3 class="text-xl font-extrabold text-emerald-800">ระบบเฝ้าระวังปกติ</h3>
                     </div>
                 </div>
             </div>
@@ -150,52 +159,46 @@
             const data = snapshot.val();
             if(!data) return;
 
-            const sosBanner = document.getElementById('sos-banner');
-            if(data.SOS_From_Home === 1) {
-                sosBanner.classList.remove('hidden'); 
-                playSiren();
+            // SOS แจ้งเตือนภัย
+            if(data.SOS_From_Home === 1) { document.getElementById('sos-banner').classList.remove('hidden'); playSiren(); } 
+            else { document.getElementById('sos-banner').classList.add('hidden'); }
+
+            // ☀️ มอนิเตอร์ยาเช้า
+            const cMorning = document.getElementById('card-med-morning');
+            if(data.Med_Morning === 1) {
+                cMorning.className = "bg-gradient-to-br from-amber-100 to-yellow-50 border border-amber-300 shadow-md p-5 rounded-[2rem] flex flex-col items-center justify-center text-center animate-pulse";
+                document.getElementById('icon-med-morning').innerText = "⏳";
+                document.getElementById('title-med-morning').innerText = "เตือนยาเช้า: รอยายทานยา";
+                document.getElementById('desc-med-morning').innerText = "ตู้ยากำลังส่งสัญญาณไฟ/เสียงเตือน";
             } else {
-                sosBanner.classList.add('hidden'); 
+                cMorning.className = "bg-white/80 border border-white shadow-lg p-5 rounded-[2rem] flex flex-col items-center justify-center text-center";
+                document.getElementById('icon-med-morning').innerText = "✅";
+                document.getElementById('title-med-morning').innerText = "ยาเช้า: ทานแล้ว";
+                document.getElementById('desc-med-morning').innerText = "คุณยายกดยืนยันทานยาเรียบร้อย";
             }
 
-            const medCard = document.getElementById('med-status-card');
-            const medIcon = document.getElementById('med-icon');
-            const medTitle = document.getElementById('med-title');
-            const medDesc = document.getElementById('med-desc');
-
-            if(data.Med_Alert === 1) {
-                medCard.className = "bg-gradient-to-br from-amber-100 to-yellow-50 border border-amber-300 shadow-[0_0_30px_rgba(251,191,36,0.4)] p-6 md:p-8 rounded-[2rem] flex flex-col items-center justify-center transition-all duration-500 animate-pulse relative overflow-hidden text-center";
-                medIcon.innerText = "⏳";
-                medTitle.innerText = "รอคุณยายทานยา...";
-                medTitle.className = "text-xl md:text-3xl font-extrabold text-amber-800 mb-2 z-10";
-                medDesc.innerText = "กำลังเปิดสัญญาณไฟเตือนที่ตู้ยา";
-                medDesc.className = "text-amber-700 font-semibold text-sm md:text-lg z-10 bg-amber-200/50 px-4 py-1 rounded-full";
+            // 🌙 มอนิเตอร์ยาเย็น
+            const cEvening = document.getElementById('card-med-evening');
+            if(data.Med_Evening === 1) {
+                cEvening.className = "bg-gradient-to-br from-indigo-100 to-purple-50 border border-indigo-300 shadow-md p-5 rounded-[2rem] flex flex-col items-center justify-center text-center animate-pulse";
+                document.getElementById('icon-med-evening').innerText = "⏳";
+                document.getElementById('title-med-evening').innerText = "เตือนยาเย็น: รอยายทานยา";
+                document.getElementById('desc-med-evening').innerText = "ตู้ยากำลังส่งสัญญาณไฟ/เสียงเตือน";
             } else {
-                medCard.className = "bg-white/80 border border-white shadow-lg p-6 md:p-8 rounded-[2rem] flex flex-col items-center justify-center transition-all duration-500 relative overflow-hidden text-center";
-                medIcon.innerText = "✅";
-                medTitle.innerText = "สถานะการทานยาปกติ";
-                medTitle.className = "text-xl md:text-3xl font-extrabold text-slate-800 mb-2 z-10";
-                medDesc.innerText = "ยังไม่ถึงเวลา หรือทานเรียบร้อยแล้ว";
-                medDesc.className = "text-slate-600 font-semibold text-sm md:text-lg z-10 bg-white/50 px-4 py-1 rounded-full";
+                cEvening.className = "bg-white/80 border border-white shadow-lg p-5 rounded-[2rem] flex flex-col items-center justify-center text-center";
+                document.getElementById('icon-med-evening').innerText = "✅";
+                document.getElementById('title-med-evening').innerText = "ยาเย็น: ทานแล้ว";
+                document.getElementById('desc-med-evening').innerText = "คุณยายกดยืนยันทานยาเรียบร้อย";
             }
         });
 
-        function sendMedReminder() {
-            db.ref('WeCare').update({ Med_Alert: 1 });
-            alert("ส่งสัญญาณเตือนไปที่ตู้ยาคุณยายแล้วครับ!");
+        function sendMedReminder(type) {
+            if(type === 'morning') { db.ref('WeCare').update({ Med_Morning: 1 }); alert("ส่งสัญญาณเตือนยาเช้าแล้ว!"); }
+            if(type === 'evening') { db.ref('WeCare').update({ Med_Evening: 1 }); alert("ส่งสัญญาณเตือนยาเย็นแล้ว!"); }
         }
-        function triggerFindItem() {
-            db.ref('WeCare').update({ Find_Item: 1 });
-            alert("ส่งเสียงเตือนหาของแล้วครับ!");
-            setTimeout(() => { db.ref('WeCare').update({ Find_Item: 0 }); }, 5000);
-        }
-        function clearSOS() {
-            db.ref('WeCare').update({ SOS_From_Home: 0 });
-        }
-        function playSiren() {
-            let audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-            audio.play().catch(e => console.log("รอการคลิกหน้าจอ"));
-        }
+        function triggerFindItem() { db.ref('WeCare').update({ Find_Item: 1 }); alert("ส่งสัญญาณหาของแล้ว!"); setTimeout(() => { db.ref('WeCare').update({ Find_Item: 0 }); }, 5000); }
+        function clearSOS() { db.ref('WeCare').update({ SOS_From_Home: 0 }); }
+        function playSiren() { let audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'); audio.play().catch(e => console.log("รอเปิดสิทธิ์เสียง")); }
     </script>
 </body>
 </html>
